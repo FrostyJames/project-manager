@@ -1,0 +1,10 @@
+[90m= [39m[34;4mApp\Models\Project[39;24m {#8908
+    [34mname[39m: [32m"[39m[32mProject Manager[39m[32m"[39m,
+    [34mdescription[39m: [32m"[39m[32mOur first project management project.[39m[32m"[39m,
+    [34mstatus[39m: [32m"[39m[32mplanning[39m[32m"[39m,
+    [34mstart_date[39m: [32m"[39m[32m2026-08-24 07:16:23[39m[32m"[39m,
+    [34mteam_id[39m: [35m1[39m,
+    [34mupdated_at[39m: [32m"[39m[32m2026-08-24 07:16:23[39m[32m"[39m,
+    [34mcreated_at[39m: [32m"[39m[32m2026-08-24 07:16:23[39m[32m"[39m,
+    [34mid[39m: [35m1[39m,
+  }
