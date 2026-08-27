@@ -1,18 +1,18 @@
+
 FROM dunglas/frankenphp:php8.5-bookworm
 
 WORKDIR /app
 
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-
-COPY . .
-
-RUN apt-get update \
-    && apt-get install -y \
-        git \
-        unzip \
-        libsqlite3-dev \
-        libicu-dev \
-        libzip-dev \
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    unzip \
+    curl \
+    libsqlite3-dev \
+    libicu-dev \
+    libzip-dev \
+    nodejs \
+    npm \
     && docker-php-ext-install \
         pdo_sqlite \
         intl \
@@ -20,25 +20,41 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Install Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# Copy application
+COPY . .
+
+# Install PHP dependencies first.
+# This creates vendor/livewire/flux before Vite runs.
 RUN composer install \
     --no-dev \
     --optimize-autoloader \
-    --no-interaction
+    --no-interaction \
+    --prefer-dist
 
-RUN php artisan optimize:clear
+# Install frontend dependencies
+RUN npm ci
 
-RUN npm install && npm run build
+# Build Vite assets
+RUN npm run build
 
-RUN mkdir -p storage/framework/cache \
+# Prepare Laravel directories
+RUN mkdir -p \
+    storage/framework/cache \
     storage/framework/sessions \
     storage/framework/views \
     storage/logs \
     bootstrap/cache
 
+# Set permissions
 RUN chown -R www-data:www-data \
     storage \
     bootstrap/cache
 
+# Laravel production server
 EXPOSE 8080
 
 CMD ["frankenphp", "php-server", "--listen", ":8080", "--root", "/app/public"]
+
