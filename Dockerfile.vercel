@@ -1,0 +1,44 @@
+FROM dunglas/frankenphp:php8.5-bookworm
+
+WORKDIR /app
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+COPY . .
+
+RUN apt-get update \
+    && apt-get install -y \
+        git \
+        unzip \
+        libsqlite3-dev \
+        libicu-dev \
+        libzip-dev \
+    && docker-php-ext-install \
+        pdo_sqlite \
+        intl \
+        zip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN composer install \
+    --no-dev \
+    --optimize-autoloader \
+    --no-interaction
+
+RUN php artisan optimize:clear
+
+RUN npm install && npm run build
+
+RUN mkdir -p storage/framework/cache \
+    storage/framework/sessions \
+    storage/framework/views \
+    storage/logs \
+    bootstrap/cache
+
+RUN chown -R www-data:www-data \
+    storage \
+    bootstrap/cache
+
+EXPOSE 8080
+
+CMD ["frankenphp", "php-server", "--listen", ":8080", "--root", "/app/public"]
