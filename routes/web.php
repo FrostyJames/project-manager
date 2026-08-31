@@ -19,6 +19,3 @@ Route::prefix('{current_team}')
     });
 
 require __DIR__.'/settings.php';
-Route::get('/{any}', function () {
-    return view('welcome');
-})->where('any', '.*');
