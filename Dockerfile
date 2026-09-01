@@ -1,15 +1,19 @@
 # Stage 1: Build frontend assets
-FROM node:18 AS frontend
+FROM node:22 AS frontend
 
 WORKDIR /app
 
 # Copy only package files first for caching
 COPY package.json package-lock.json* ./
-RUN npm install
+RUN npm install -g npm@latest && npm install
 
 # Copy the rest of the frontend code
 COPY resources ./resources
 COPY vite.config.js ./
+COPY tailwind.config.js ./
+COPY postcss.config.js ./
+
+# Build frontend assets
 RUN npm run build
 
 
